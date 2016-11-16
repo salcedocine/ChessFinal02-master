@@ -20,11 +20,11 @@ void ofApp::setup()
     
 //    game.Move(Coordinate(6, 1), Coordinate(4, 1));
     
-     std::cout << "original valid x:" << validA << std::endl;
-       std::cout << "original valid y:" << validB << std::endl;
-    std::cout << "original to move y:" << toMoveB << std::endl;
-    std::cout << "original to move y:" << toMoveA << std::endl;
-    
+//     std::cout << "original valid x:" << validA << std::endl;
+//       std::cout << "original valid y:" << validB << std::endl;
+//    std::cout << "original to move y:" << toMoveB << std::endl;
+//    std::cout << "original to move y:" << toMoveA << std::endl;
+
 }
 
 
@@ -38,8 +38,7 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-    ofDrawBitmapStringHighlight(ColorToString(game.GetTurn()), 20, 20);
-    
+
     
     int width = 100;
     int height = 100;
@@ -90,8 +89,7 @@ void ofApp::draw()
 //                ofDrawBitmapStringHighlight(pieceColorString, currentX, currentY);
                 
                 if (pieceColorString == "black")
-                
-                ofDrawBitmapStringHighlight(pieceNameString, currentX + width / 2, currentY  + height / 2, 0);
+                    ofDrawBitmapStringHighlight(pieceNameString, currentX + width / 2, currentY  + height / 2, 0);
                 else
                     ofDrawBitmapStringHighlight(pieceNameString, currentX + width / 2, currentY  + height / 2, 255, 0);
 
@@ -102,83 +100,59 @@ void ofApp::draw()
             
         }
     }
+
+    ofDrawBitmapStringHighlight(ColorToString(game.GetTurn()), 20, 20);
+
+//    cout << points.size() << endl;
 }
-    void ofApp::mouseMoved(int x, int y ){
-        
-        ofPoint mousePosition(x, y);
-        points.push_back(mousePosition);
-        
-        int a = ofMap(mousePosition.x, 0, 800, 0, 8, true);
-        int b = ofMap(mousePosition.y, 0, 800, 0, 8, true);
-   
-        
-        
+
+
+void ofApp::mousePressed(int x, int y, int button)
+{
+    // Get the current coordinate for the mouse.
+    Coordinate coordinate = getCoordinateForMouse(x, y);
+
+    validMoves = game.GetValidMoves(coordinate);
+
+    if (validMoves.size() > 0)
+    {
+        selectedPiece = coordinate;
     }
-    void ofApp::mousePressed(int x, int y, int button){
-        if(ofGetMousePressed(OF_MOUSE_BUTTON_LEFT)) {
-            
-            ofPoint mousePosition(ofGetMouseX(), ofGetMouseY());
-            points.push_back(mousePosition);
-            
-            int a = ofMap(mousePosition.x, 0, 800, 0, 8, true);
-            int b = ofMap(mousePosition.y, 0, 800, 0, 8, true);
-//                         game.Move(Coordinate(a, b), Coordinate(toMoveB, toMoveA));
-            std::cout << "x:" << a << std::endl;
-            std::cout << "y:" << b << std::endl;
-            set<Coordinate> validMoves = game.GetValidMoves(Coordinate(b, a));
-            
-            std::cout << "Valid moves ... " << validMoves.size() << std::endl;
-            for (Coordinate move: validMoves)
-                
+    else
+    {
+        selectedPiece = Coordinate(-1, -1);
+    }
+}
+
+
+
+void ofApp::mouseReleased(int x, int y, int button)
+{
+    if (selectedPiece.GetX() >= 0 && selectedPiece.GetY() >= 0)
+    {
+        Coordinate coordinate = getCoordinateForMouse(x, y);
+
+        for (Coordinate move: validMoves)
+        {
+            if (coordinate == move)
             {
-                std::cout << move.GetX() << " / " << move.GetY() << std::endl;
-                int validA = move.GetX();
-                int validB = move.GetY();
-                std::cout << "valid x:" << validA << std::endl;
-                std::cout << "valid y:" << validB << std::endl;
+                // make the move and jump out of the loop ...
+                game.Move(selectedPiece, coordinate);
+                break;
             }
         }
-        
-        if(ofGetMousePressed(OF_MOUSE_BUTTON_RIGHT)) {
-            
-            ofPoint mousePosition(ofGetMouseX(), ofGetMouseY());
-            points.push_back(mousePosition);
-            
-            int toMoveB = ofMap(mousePosition.x, 0, 800, 0, 8, true);
-            int toMoveA = ofMap(mousePosition.y, 0, 800, 0, 8, true);
-            std::cout << "to move x:" << toMoveA << std::endl;
-            std::cout << "to move y:" << toMoveB << std::endl;
-    
-          
-            
-            
-            if(toMoveA == validA and toMoveB == validB)
-           std::cout << "It works!" << std::endl;
-            
-        }
-//     game.Move(Coordinate(b, a), Coordinate(toMoveB, toMoveA));
-    
+
+        selectedPiece = Coordinate(-1, -1);
+        validMoves.clear();
     }
-
-
-            
-             
-
-void ofApp::mouseReleased(int x, int y, int button){
-    
 }
 
-void ofApp::keyPressed(int key){
-//    if (key == 'q')
-//        game.Move(Coordinate(6, 1), Coordinate(4, 1));
-    
-    
-    
-}
 
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-    
+Coordinate ofApp::getCoordinateForMouse(int x, int y)
+{
+    int a = ofMap(x, 0, ofGetWidth(), 0, BOARD_SIZE, true);
+    int b = ofMap(y, 0, ofGetHeight(), 0, BOARD_SIZE, true);
+    return Coordinate(b, a);
 }
 
 

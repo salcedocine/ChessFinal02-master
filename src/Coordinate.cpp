@@ -45,6 +45,21 @@ void Coordinate::Copy(const Coordinate & Other)
     Y = Other.Y;
 
 }
+
+
+bool Coordinate::operator==(const Coordinate &Other) const
+{
+    if (Y == Other.GetY() && X == Other.GetX())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
 bool Coordinate:: operator<(const Coordinate & Other) const
 {
     if (X<Other.X)		//First sort to X
